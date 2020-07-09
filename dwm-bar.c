@@ -14,6 +14,8 @@ const char *ending = " ";
 const char *separator = " ";
 
 
+const char *weekDays[] = { "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa" };
+
 int timeDateFunction(char *buffer, int available)
 {
     time_t currentTime;
@@ -22,7 +24,9 @@ int timeDateFunction(char *buffer, int available)
     time(&currentTime);
     values = localtime(&currentTime);
 
-    return snprintf(buffer, available, "%d/%d%s%02d:%02d",
+    return snprintf(buffer, available, "%s%s%d/%d%s%02d:%02d",
+                    weekDays[values->tm_wday],
+                    separator,
                     values->tm_mday,
                     values->tm_mon + 1,
                     separator,
