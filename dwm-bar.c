@@ -119,7 +119,13 @@ static void display()
 
     sprintf(text + offset, "%s", ending);
 
-    printf("%s\n", text);
+    char *command[] = { "xsetroot", "-name", text, NULL };
+
+    if (fork() == 0) {
+        setsid();
+        execvp(command[0], command);
+    }
+
     free(text);
 }
 
