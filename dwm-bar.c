@@ -179,6 +179,10 @@ int main(int argc, char *argv[])
         display();
     }
 
+    for (int i = 0; i < LENGTH(stringOutputs); i++) {
+        free(stringOutputs[i]);
+    }
+
     return 0;
 }
 
