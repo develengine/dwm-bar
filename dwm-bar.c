@@ -136,6 +136,16 @@ static double subtractTime(timespec_t a, timespec_t b)
 }
 
 
+static double clipToZero(double x)
+{
+    if (x < 0) {
+        return 0;
+    }
+
+    return x;
+}
+
+
 static void update(timespec_t *sleep)
 {
     const double EPSILON = 0.0001;
@@ -160,8 +170,8 @@ static void update(timespec_t *sleep)
         shortestTime = shortestTime < timeLeft ? shortestTime : timeLeft;
     }
 
-    sleep->tv_sec = (time_t)shortestTime;
-    sleep->tv_nsec = (long)(fmod(shortestTime, 1) * 1000000000);
+    sleep->tv_sec = (time_t)clipToZero(shortestTime);
+    sleep->tv_nsec = (long)clipToZero(fmod(shortestTime, 1) * 1000000000);
 }
 
 
