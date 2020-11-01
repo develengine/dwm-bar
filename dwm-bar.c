@@ -1,12 +1,9 @@
+#include <X11/Xlib.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <stdio.h>
 #include <time.h>
-#include <float.h>
 #include <math.h>
 #include <string.h>
-#include <sys/types.h>
-#include <sys/wait.h>
 
 
 #define BUFFER_SIZE 512
@@ -34,6 +31,11 @@ typedef struct {
     double updateInterval;
     timespec_t lastUpdate;
 } Entry;
+
+
+static Display *display;
+static int screen;
+static Window root;
 
 
 const char *weekDays[] = { "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa" };
@@ -96,7 +98,7 @@ Entry entries[] = {
 char *stringOutputs[sizeof(entries) / sizeof(Entry)] = { 0 };
 
 
-static void display()
+static void show()
 {
     int infoLength = 0;
     int paddingLength = (LENGTH(stringOutputs) - 1) * strlen(separator)
@@ -119,12 +121,8 @@ static void display()
 
     sprintf(text + offset, "%s", ending);
 
-    char *command[] = { "xsetroot", "-name", text, NULL };
-
-    if (fork() == 0) {
-        setsid();
-        execvp(command[0], command);
-    }
+    XStoreName(display, root, text);
+    XFlush(display);
 
     free(text);
 }
@@ -178,15 +176,27 @@ static void update(timespec_t *sleep)
 int main(int argc, char *argv[])
 {
     int loop = argc > 1 && strcmp(argv[1], "loop") == 0;
+
+    display = XOpenDisplay(NULL);
+    if (!display) {
+        fprintf(stderr, "ERROR: Failed call to XOpenDisplay.\n");
+        exit(-1);
+    }
+
+    screen = DefaultScreen(display);
+    root = RootWindow(display, screen);
+
     timespec_t sleepTime;
 
     update(&sleepTime);
-    display();
+    show();
+
+    int it = 0;
 
     while(loop) {
         nanosleep(&sleepTime, NULL);
         update(&sleepTime);
-        display();
+        show();
     }
 
     for (int i = 0; i < LENGTH(stringOutputs); i++) {

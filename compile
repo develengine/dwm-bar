@@ -1,0 +1,3 @@
+#! /bin/sh
+
+gcc dwm-bar.c -o dwm-bar -lm -lX11
