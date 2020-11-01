@@ -203,6 +203,8 @@ int main(int argc, char *argv[])
         free(stringOutputs[i]);
     }
 
+    XCloseDisplay(display);
+
     return 0;
 }
 
