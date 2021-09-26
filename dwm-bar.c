@@ -90,7 +90,31 @@ static char *volumeFunction()
 }
 
 
+static char* batteryFunction()
+{
+    char buffer[256];
+    FILE *file = fopen("/sys/class/power_supply/BAT0/status", "r");
+    if (!file) {
+        FORMAT_OUTPUT("[BAT error]");
+    }
+
+    size_t read = fread(buffer, 1, 256, file);
+    fclose(file);
+    buffer[read >= 256 ? 255 : read] = 0;
+
+    int discharging = strcmp(buffer, "Discharging\n") == 0;
+
+    file = fopen("/sys/class/power_supply/BAT0/capacity", "r");
+    read = fread(buffer, 1, 256, file);
+    fclose(file);
+    buffer[read >= 256 ? 254 : read - 1] = 0;
+
+    FORMAT_OUTPUT("[%s %s]", discharging ? "Dis" : "Cha", buffer);
+}
+
+
 Entry entries[] = { 
+    { batteryFunction, 10.0, 0 },
     { volumeFunction, 10.0, 0 },
     { timeDateFunction, 1.0, 0 },
 };
