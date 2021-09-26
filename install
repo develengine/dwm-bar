@@ -1,4 +1,4 @@
 #! /bin/sh
 
-rm /usr/bin/dwm-bar
+rm -f /usr/bin/dwm-bar
 cp dwm-bar /usr/bin
